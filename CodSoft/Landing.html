@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NexaAI — Think Beyond Intelligence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── RESET & ROOT ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    :root {
+      --bg:        #080810;
+      --surface:   #0E0E1A;
+      --border:    rgba(255,255,255,0.07);
+      --white:     #F0EEF8;
+      --muted:     #7A788C;
+      --accent:    #7C5CFC;
+      --accent2:   #FC5C7D;
+      --gold:      #F0C060;
+      --glow:      rgba(124,92,252,0.35);
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'Crimson Pro', Georgia, serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── CUSTOM CURSOR ── */
+    .cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+      mix-blend-mode: screen;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1.5px solid rgba(124,92,252,0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.18s ease, width 0.3s, height 0.3s, border-color 0.3s;
+    }
+    body:has(a:hover) .cursor-ring,
+    body:has(button:hover) .cursor-ring { width: 54px; height: 54px; border-color: var(--accent2); }
+
+    /* ── GRAIN OVERLAY ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9998; opacity: 0.6;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.5rem 5vw;
+      background: rgba(8,8,16,0.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: var(--font-head);
+      font-weight: 800; font-size: 1.3rem;
+      letter-spacing: -0.03em; color: var(--white);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--accent); }
+    nav ul { list-style: none; display: flex; gap: 2.5rem; align-items: center; }
+    nav a { text-decoration: none; font-family: var(--font-head); font-size: 0.78rem;
+      font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); transition: color 0.25s; }
+    nav a:hover { color: var(--white); }
+    .nav-cta {
+      padding: 0.55rem 1.4rem;
+      background: var(--accent);
+      color: white !important;
+      border-radius: 2px;
+      transition: background 0.25s, box-shadow 0.25s !important;
+    }
+    .nav-cta:hover { background: #9070ff !important; box-shadow: 0 0 24px var(--glow) !important; }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      position: relative;
+      overflow: hidden;
+      padding: 0 5vw;
+    }
+
+    /* Animated background mesh */
+    .hero-mesh {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 70% 40%, rgba(124,92,252,0.18) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 40% at 20% 70%, rgba(252,92,125,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(8,8,16,0) 0%, var(--bg) 100%);
+    }
+
+    /* Animated grid */
+    .hero-grid {
+      position: absolute; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(124,92,252,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,92,252,0.06) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+    }
+
+    .hero-inner {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      justify-content: center;
+      padding-top: 10rem;
+      padding-bottom: 4rem;
+      max-width: 900px;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.35rem 1rem;
+      border: 1px solid rgba(124,92,252,0.4);
+      border-radius: 100px;
+      background: rgba(124,92,252,0.08);
+      font-family: var(--font-head);
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent);
+      width: fit-content;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.8s ease both;
+    }
+    .hero-badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.4); }
+    }
+
+    h1 {
+      font-family: var(--font-head);
+      font-size: clamp(3rem, 7.5vw, 7rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.9s 0.1s ease both;
+    }
+    h1 .line2 {
+      display: block;
+      font-family: var(--font-body);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(2.6rem, 6.5vw, 6.2rem);
+      color: var(--accent);
+      letter-spacing: -0.02em;
+    }
+    h1 .line3 {
+      display: block;
+      -webkit-text-stroke: 1px rgba(240,238,248,0.25);
+      color: transparent;
+    }
+
+    .hero-desc {
+      font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 54ch;
+      margin-bottom: 3rem;
+      animation: fadeUp 1s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      animation: fadeUp 1s 0.3s ease both;
+    }
+
+    .btn-glow {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      padding: 0.9rem 2.2rem;
+      background: var(--accent);
+      color: white;
+      font-family: var(--font-head);
+      font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      text-decoration: none; border: none; cursor: none;
+      border-radius: 2px;
+      position: relative; overflow: hidden;
+      transition: box-shadow 0.3s, transform 0.2s;
+    }
+    .btn-glow::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .btn-glow:hover { box-shadow: 0 0 36px var(--glow), 0 4px 20px rgba(0,0,0,0.4); transform: translateY(-2px); }
+    .btn-glow:hover::before { opacity: 1; }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      padding: 0.9rem 2.2rem;
+      background: transparent;
+      color: var(--white);
+      font-family: var(--font-head);
+      font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      text-decoration: none; border: 1px solid var(--border);
+      border-radius: 2px; cursor: none;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.04); }
+
+    /* Floating stat cards */
+    .hero-stats {
+      position: relative; z-index: 2;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 1s 0.5s ease both;
+    }
+    .stat-item {
+      padding: 2rem 2rem;
+      background: rgba(255,255,255,0.015);
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-family: var(--font-head);
+      font-size: 2.6rem; font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, var(--white), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label {
+      font-size: 0.8rem; color: var(--muted);
+      font-family: var(--font-head);
+      letter-spacing: 0.05em; margin-top: 0.2rem;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── FEATURES ── */
+    #features {
+      padding: 8rem 5vw;
+      position: relative;
+    }
+    #features::before {
+      content: '';
+      position: absolute; top: 0; left: 5vw; right: 5vw;
+      height: 1px; background: var(--border);
+    }
+
+    .section-header {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: end;
+      margin-bottom: 5rem;
+    }
+
+    .section-eyebrow {
+      font-family: var(--font-head);
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1.2rem;
+    }
+
+    h2 {
+      font-family: var(--font-head);
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 800; line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    h2 em { font-family: var(--font-body); font-style: italic; font-weight: 300; color: var(--accent); }
+
+    .section-desc {
+      font-size: 1.05rem; font-weight: 300;
+      color: var(--muted); line-height: 1.8;
+      align-self: end;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .feature-card {
+      background: var(--surface);
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .feature-card:hover { background: rgba(124,92,252,0.06); }
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      width: 48px; height: 48px;
+      background: rgba(124,92,252,0.12);
+      border: 1px solid rgba(124,92,252,0.25);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .feature-num {
+      position: absolute; top: 2.5rem; right: 2.5rem;
+      font-family: var(--font-head);
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.12);
+    }
+
+    .feature-title {
+      font-family: var(--font-head);
+      font-size: 1.05rem; font-weight: 700;
+      margin-bottom: 0.8rem;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-text {
+      font-size: 0.95rem; font-weight: 300;
+      color: var(--muted); line-height: 1.75;
+    }
+
+    /* ── HOW IT WORKS ── */
+    #how {
+      padding: 8rem 5vw;
+      background: var(--surface);
+      position: relative;
+    }
+
+    .steps-wrap {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      margin-top: 5rem;
+      position: relative;
+    }
+
+    /* Connector line */
+    .steps-wrap::before {
+      content: '';
+      position: absolute;
+      top: 36px; left: calc(12.5% + 24px); right: calc(12.5% + 24px);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+      z-index: 0;
+    }
+
+    .step {
+      padding: 0 2rem;
+      text-align: center;
+      position: relative; z-index: 1;
+    }
+
+    .step-num {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1.5px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head);
+      font-size: 0.85rem; font-weight: 800;
+      color: var(--accent);
+      margin: 0 auto 1.5rem;
+      position: relative;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .step:hover .step-num {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 0 20px var(--glow);
+    }
+
+    .step-title {
+      font-family: var(--font-head);
+      font-size: 0.95rem; font-weight: 700;
+      margin-bottom: 0.7rem;
+    }
+
+    .step-text {
+      font-size: 0.88rem; font-weight: 300;
+      color: var(--muted); line-height: 1.7;
+    }
+
+    /* ── TESTIMONIALS ── */
+    #testimonials { padding: 8rem 5vw; }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 4rem;
+    }
+
+    .testi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      border-radius: 2px;
+      position: relative;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .testi-card:hover { border-color: rgba(124,92,252,0.3); transform: translateY(-4px); }
+    .testi-card.featured { grid-row: span 1; background: rgba(124,92,252,0.06); border-color: rgba(124,92,252,0.25); }
+
+    .testi-quote {
+      font-size: 2.5rem;
+      color: var(--accent);
+      font-family: Georgia, serif;
+      line-height: 1;
+      margin-bottom: 1.2rem;
+      opacity: 0.6;
+    }
+
+    .testi-text {
+      font-size: 1rem; font-weight: 300;
+      font-style: italic;
+      color: rgba(240,238,248,0.8);
+      line-height: 1.8;
+      margin-bottom: 1.8rem;
+    }
+
+    .testi-author { display: flex; align-items: center; gap: 0.9rem; }
+
+    .testi-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head); font-size: 0.85rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .testi-name {
+      font-family: var(--font-head); font-size: 0.85rem; font-weight: 700;
+    }
+    .testi-role { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+
+    .stars { color: var(--gold); font-size: 0.75rem; letter-spacing: 0.1em; margin-bottom: 1rem; }
+
+    /* ── PRICING ── */
+    #pricing {
+      padding: 8rem 5vw;
+      background: var(--surface);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 4rem;
+    }
+
+    .price-card {
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      border-radius: 2px;
+      position: relative;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .price-card:hover { transform: translateY(-4px); }
+    .price-card.popular {
+      border-color: var(--accent);
+      background: rgba(124,92,252,0.05);
+    }
+
+    .popular-badge {
+      position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+      background: var(--accent);
+      color: white;
+      font-family: var(--font-head);
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.25rem 1rem; border-radius: 100px;
+    }
+
+    .price-plan {
+      font-family: var(--font-head);
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 1.5rem;
+    }
+    .price-card.popular .price-plan { color: var(--accent); }
+
+    .price-amount {
+      font-family: var(--font-head);
+      font-size: 3.2rem; font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.3rem;
+    }
+    .price-amount sup { font-size: 1.3rem; vertical-align: super; }
+    .price-period { font-size: 0.82rem; color: var(--muted); margin-bottom: 2rem; }
+
+    .price-divider { height: 1px; background: var(--border); margin-bottom: 2rem; }
+
+    .price-features { list-style: none; margin-bottom: 2.5rem; }
+    .price-features li {
+      display: flex; align-items: center; gap: 0.7rem;
+      font-size: 0.9rem; font-weight: 300; color: rgba(240,238,248,0.75);
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .price-features li::before {
+      content: '✓';
+      color: var(--accent); font-weight: 700; font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+    .price-features li.dim { color: var(--muted); }
+    .price-features li.dim::before { color: rgba(255,255,255,0.15); }
+
+    .btn-price {
+      display: block; width: 100%; text-align: center;
+      padding: 0.9rem;
+      font-family: var(--font-head);
+      font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      text-decoration: none; border-radius: 2px; cursor: none;
+      transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+    }
+    .btn-price-outline {
+      border: 1px solid var(--border); color: var(--white);
+    }
+    .btn-price-outline:hover { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.04); }
+    .btn-price-fill {
+      background: var(--accent); color: white;
+    }
+    .btn-price-fill:hover { box-shadow: 0 0 28px var(--glow); transform: translateY(-2px); }
+
+    /* ── CTA BAND ── */
+    #cta {
+      padding: 7rem 5vw;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    #cta::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(124,92,252,0.15), transparent);
+    }
+    #cta h2 {
+      font-size: clamp(2rem, 5vw, 4.5rem);
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    #cta p {
+      font-size: 1.1rem; font-weight: 300;
+      color: var(--muted); max-width: 48ch; margin: 0 auto 3rem;
+      position: relative;
+    }
+    .cta-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; position: relative; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 4rem 5vw 2rem;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 4rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .footer-brand p {
+      font-size: 0.9rem; font-weight: 300;
+      color: var(--muted); line-height: 1.75;
+      margin: 1rem 0 1.5rem;
+      max-width: 28ch;
+    }
+
+    .footer-col h4 {
+      font-family: var(--font-head);
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 1.2rem;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 0.7rem; }
+    .footer-col a {
+      text-decoration: none; font-size: 0.88rem; font-weight: 300;
+      color: rgba(240,238,248,0.55);
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: var(--white); }
+
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+      padding-top: 2rem;
+    }
+    .footer-copy {
+      font-size: 0.78rem; color: var(--muted);
+      font-family: var(--font-head); letter-spacing: 0.04em;
+    }
+    .footer-socials { display: flex; gap: 1rem; }
+    .social-btn {
+      width: 34px; height: 34px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      font-family: var(--font-head);
+      font-size: 0.65rem; font-weight: 700;
+      color: var(--muted);
+      transition: border-color 0.25s, color 0.25s;
+    }
+    .social-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .steps-wrap { grid-template-columns: repeat(2, 1fr); }
+      .steps-wrap::before { display: none; }
+      .step { padding: 2rem; }
+      .testimonials-grid { grid-template-columns: 1fr 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 3rem; }
+    }
+    @media (max-width: 768px) {
+      nav ul { display: none; }
+      .section-header { grid-template-columns: 1fr; gap: 1.5rem; }
+      .features-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .hero-stats { grid-template-columns: 1fr; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CURSOR -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">Nexa<span>AI</span></a>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#testimonials">Reviews</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#cta" class="nav-cta">Get Started</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <section id="hero">
+    <div class="hero-mesh"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        Now in Public Beta — Join 12,000+ users
+      </div>
+      <h1>
+        Think
+        <span class="line2">Beyond</span>
+        <span class="line3">Intelligence.</span>
+      </h1>
+      <p class="hero-desc">
+        NexaAI is the next-generation AI platform that transforms the way your team creates, analyses, and decides. Less guesswork. More clarity. Infinite possibilities.
+      </p>
+      <div class="hero-actions">
+        <a href="#cta" class="btn-glow">
+          Start Free Trial
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#how" class="btn-ghost">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          Watch Demo
+        </a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">98%</div>
+        <div class="stat-label">Accuracy Rate</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">3.2×</div>
+        <div class="stat-label">Faster Decisions</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">12K+</div>
+        <div class="stat-label">Active Teams</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FEATURES ═══ -->
+  <section id="features">
+    <div class="section-header">
+      <div class="reveal">
+        <div class="section-eyebrow">Core Features</div>
+        <h2>Everything your team needs to <em>move faster</em></h2>
+      </div>
+      <p class="section-desc reveal reveal-delay-1">
+        A complete AI toolkit designed for modern teams — from real-time analytics to intelligent automation, all in one seamless platform.
+      </p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">🧠</div>
+        <div class="feature-num">01</div>
+        <div class="feature-title">Neural Analytics Engine</div>
+        <p class="feature-text">Process millions of data points in seconds. Our deep learning models surface patterns invisible to traditional tools, giving you insight before your competition.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-num">02</div>
+        <div class="feature-title">Real-Time Intelligence</div>
+        <p class="feature-text">Live dashboards that update as data streams in. React to market shifts, user behaviour changes, and operational anomalies the instant they happen.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">🔮</div>
+        <div class="feature-num">03</div>
+        <div class="feature-title">Predictive Forecasting</div>
+        <p class="feature-text">From sales forecasts to risk modelling — our LSTM-based prediction engine delivers 94%+ accuracy on time-series data across any domain.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">🤖</div>
+        <div class="feature-num">04</div>
+        <div class="feature-title">Workflow Automation</div>
+        <p class="feature-text">Build intelligent pipelines with a no-code drag-and-drop builder. Trigger actions, generate reports, and alert teams — all without writing a single line of code.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">🔐</div>
+        <div class="feature-num">05</div>
+        <div class="feature-title">Enterprise-Grade Security</div>
+        <p class="feature-text">SOC 2 Type II certified. End-to-end encryption, role-based access controls, and full audit logs. Your data stays yours — always.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon">🌐</div>
+        <div class="feature-num">06</div>
+        <div class="feature-title">300+ Integrations</div>
+        <p class="feature-text">Connect NexaAI to your existing stack in minutes. Native integrations with Salesforce, Slack, Google Workspace, AWS, and hundreds more.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ HOW IT WORKS ═══ -->
+  <section id="how">
+    <div class="section-header">
+      <div class="reveal">
+        <div class="section-eyebrow">How It Works</div>
+        <h2>Up and running in <em>four steps</em></h2>
+      </div>
+      <p class="section-desc reveal reveal-delay-1">
+        No lengthy onboarding. No data science PhD required. NexaAI is built for teams who want to start seeing results in hours, not months.
+      </p>
+    </div>
+    <div class="steps-wrap">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div class="step-title">Connect Your Data</div>
+        <p class="step-text">Link your databases, APIs, CRMs, or upload CSVs. NexaAI auto-detects schema and cleans your data automatically.</p>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num">02</div>
+        <div class="step-title">Choose Your Model</div>
+        <p class="step-text">Pick from our library of pre-trained models or describe your goal in plain English — our AI selects the best approach.</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">03</div>
+        <div class="step-title">Train & Validate</div>
+        <p class="step-text">One-click training with real-time accuracy metrics. Validate results on holdout data and fine-tune with simple sliders.</p>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <div class="step-num">04</div>
+        <div class="step-title">Deploy & Automate</div>
+        <p class="step-text">Push your model to production instantly. Set automated actions, build dashboards, and share insights across your team.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ TESTIMONIALS ═══ -->
+  <section id="testimonials">
+    <div class="section-header">
+      <div class="reveal">
+        <div class="section-eyebrow">What People Say</div>
+        <h2>Loved by teams <em>everywhere</em></h2>
+      </div>
+      <p class="section-desc reveal reveal-delay-1">
+        From early-stage startups to Fortune 500 enterprises — here's what our users have to say.
+      </p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testi-card featured reveal">
+        <div class="stars">★★★★★</div>
+        <div class="testi-quote">"</div>
+        <p class="testi-text">NexaAI completely changed how we operate. Our data team went from producing weekly reports to live dashboards that update every 30 seconds. We caught a critical supply chain issue 6 hours before it became a crisis. The ROI was immediate.</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:rgba(124,92,252,0.2);color:var(--accent);">SR</div>
+          <div>
+            <div class="testi-name">Sarah Raina</div>
+            <div class="testi-role">CTO, Meridian Logistics</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal reveal-delay-1">
+        <div class="stars">★★★★★</div>
+        <div class="testi-quote">"</div>
+        <p class="testi-text">I've evaluated 12 AI platforms. NexaAI is the only one where the forecasting actually works out of the box. 91% accuracy on our first model. Incredible.</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:rgba(252,92,125,0.2);color:var(--accent2);">MK</div>
+          <div>
+            <div class="testi-name">Marcus Kline</div>
+            <div class="testi-role">Head of Analytics, Trellis Bank</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal reveal-delay-2">
+        <div class="stars">★★★★★</div>
+        <div class="testi-quote">"</div>
+        <p class="testi-text">The automation builder saved our team 40+ hours per week. We're a 5-person startup competing with teams of 50. That's the NexaAI edge.</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:rgba(240,192,96,0.2);color:var(--gold);">AP</div>
+          <div>
+            <div class="testi-name">Anya Patel</div>
+            <div class="testi-role">Founder, LoopSpark</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PRICING ═══ -->
+  <section id="pricing">
+    <div class="section-header">
+      <div class="reveal">
+        <div class="section-eyebrow">Pricing</div>
+        <h2>Simple, <em>transparent</em> pricing</h2>
+      </div>
+      <p class="section-desc reveal reveal-delay-1">
+        No hidden fees. No surprise overages. Start free and scale as your team grows. All plans include a 14-day trial.
+      </p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card reveal">
+        <div class="price-plan">Starter</div>
+        <div class="price-amount"><sup>$</sup>0</div>
+        <div class="price-period">Free forever · Up to 3 seats</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li>5 AI Models</li>
+          <li>10K data rows/month</li>
+          <li>3 Dashboards</li>
+          <li>Community support</li>
+          <li class="dim">Custom integrations</li>
+          <li class="dim">Advanced security</li>
+        </ul>
+        <a href="#" class="btn-price btn-price-outline">Get Started Free</a>
+      </div>
+      <div class="price-card popular reveal reveal-delay-1">
+        <div class="popular-badge">Most Popular</div>
+        <div class="price-plan">Pro</div>
+        <div class="price-amount"><sup>$</sup>49</div>
+        <div class="price-period">per seat / month · Billed annually</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li>Unlimited AI Models</li>
+          <li>10M data rows/month</li>
+          <li>Unlimited Dashboards</li>
+          <li>Priority support (4h SLA)</li>
+          <li>50+ Native integrations</li>
+          <li class="dim">Dedicated infrastructure</li>
+        </ul>
+        <a href="#" class="btn-price btn-price-fill">Start 14-day Trial</a>
+      </div>
+      <div class="price-card reveal reveal-delay-2">
+        <div class="price-plan">Enterprise</div>
+        <div class="price-amount">Custom</div>
+        <div class="price-period">Volume pricing · Custom contract</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li>Everything in Pro</li>
+          <li>Unlimited data</li>
+          <li>Dedicated infrastructure</li>
+          <li>24/7 white-glove support</li>
+          <li>300+ integrations + custom</li>
+          <li>SOC 2 + HIPAA compliance</li>
+        </ul>
+        <a href="#" class="btn-price btn-price-outline">Talk to Sales</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CTA BAND ═══ -->
+  <section id="cta">
+    <h2 class="reveal">Ready to think <em>beyond</em><br/>what's possible?</h2>
+    <p class="reveal reveal-delay-1">Join 12,000+ forward-thinking teams already using NexaAI. No credit card required. Set up in under 5 minutes.</p>
+    <div class="cta-actions reveal reveal-delay-2">
+      <a href="#" class="btn-glow">Start Free — No Card Needed</a>
+      <a href="#" class="btn-ghost">Schedule a Demo</a>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo" style="display:inline-block;margin-bottom:0.5rem;">Nexa<span style="color:var(--accent)">AI</span></a>
+        <p>The intelligent platform for teams who move fast and think big. Built for the AI-first era.</p>
+        <div class="footer-socials">
+          <a href="#" class="social-btn">TW</a>
+          <a href="#" class="social-btn">LI</a>
+          <a href="#" class="social-btn">GH</a>
+          <a href="#" class="social-btn">YT</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Pricing</a></li>
+          <li><a href="#">Changelog</a></li>
+          <li><a href="#">Roadmap</a></li>
+          <li><a href="#">API Docs</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+          <li><a href="#">Security</a></li>
+          <li><a href="#">GDPR</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 NexaAI Inc. All rights reserved.</div>
+      <div class="footer-copy" style="color:rgba(122,120,140,0.5);">Crafted with precision · Built for the future</div>
+    </div>
+  </footer>
+
+  <script>
+    // ── Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animCursor() {
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animCursor);
+    }
+    animCursor();
+
+    // ── Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => obs.observe(el));
+
+    // ── Navbar scroll style
+    window.addEventListener('scroll', () => {
+      document.querySelector('nav').style.background =
+        window.scrollY > 60 ? 'rgba(8,8,16,0.95)' : 'rgba(8,8,16,0.7)';
+    });
+
+    // ── Active nav highlight
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('nav a[href^="#"]');
+    window.addEventListener('scroll', () => {
+      let cur = '';
+      sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) cur = s.id; });
+      navLinks.forEach(l => {
+        l.style.color = l.getAttribute('href') === '#' + cur ? 'var(--white)' : '';
+      });
+    });
+  </script>
+</body>
+</html>
